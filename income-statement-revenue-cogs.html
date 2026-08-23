@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Income Statement — Revenue &amp; COGS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root{
+    --paper:#E9E6DC;
+    --panel:#F5F3EC;
+    --ink:#20262B;
+    --ink-muted:#5B6570;
+    --brass:#A8703A;
+    --brass-deep:#8A5B2C;
+    --teal:#3C7268;
+    --teal-deep:#2C5850;
+    --rule:#C7C2B4;
+    --radius:14px;
+    --c-hero:#2F7A5E;
+    --c-eicher:#C1652E;
+    --c-tvs:#2E6DB4;
+    --c-bajaj:#9B3FA0;
+    --ok:#2F7A5E;
+    --no:#9AA0A6;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size:38px 38px;
+    background-position:-1px -1px;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+  }
+
+  .page{max-width:1080px; margin:0 auto; padding:36px 26px 56px;}
+
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--brass); outline-offset:3px;}
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--brass-deep);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(28px, 3.6vw, 38px);
+    line-height:1.02;
+    margin:0 0 22px;
+    letter-spacing:-0.015em;
+  }
+  h1 .soft{color:var(--ink-muted); font-weight:600;}
+
+  .dek{
+    max-width:700px;
+    font-size:clamp(13px, 1vw, 15px);
+    color:var(--ink-muted);
+    margin:0;
+  }
+
+  section{margin-top:40px;}
+
+  /* ---------- Revenue block ---------- */
+  .revenue-card{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:20px;
+    padding:26px 28px 26px;
+    box-shadow:0 1px 0 rgba(0,0,0,.03);
+  }
+  .revenue-card::before{
+    content:"";
+    position:absolute; left:0; top:28px; bottom:28px; width:6px;
+    background:var(--brass);
+    border-radius:0 3px 3px 0;
+  }
+  .tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:11.5px;
+    color:var(--brass-deep);
+    background:rgba(168,112,58,.12);
+    border:1px solid rgba(168,112,58,.35);
+    border-radius:6px;
+    padding:4px 10px;
+    margin-bottom:20px;
+    letter-spacing:.04em;
+  }
+  .revenue-card h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(21px, 2.2vw, 26px);
+    margin:0 0 18px;
+    line-height:1.05;
+  }
+  .revenue-card h2 .alt{color:var(--ink-muted); font-weight:500; font-size:.5em;}
+  .revenue-card > p.big{
+    margin:0 0 30px;
+    max-width:820px;
+    color:var(--ink);
+    font-size:clamp(14px, 1.2vw, 15.5px);
+    line-height:1.5;
+    font-weight:400;
+  }
+  .formula{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:clamp(12.5px, 1.05vw, 14px);
+    font-weight:600;
+    background:var(--ink);
+    color:var(--paper);
+    display:inline-block;
+    padding:9px 14px;
+    border-radius:8px;
+    letter-spacing:.01em;
+    margin-bottom:24px;
+  }
+
+  /* ---------- Invoice breakdown ---------- */
+  .invoice{
+    border-top:1px solid var(--rule);
+    padding-top:38px;
+  }
+  .invoice-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:22px;
+  }
+  .invoice-head h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(14.5px, 1.5vw, 17px);
+    margin:0;
+  }
+  .invoice-head span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-muted);
+  }
+  .invoice-bar{
+    display:flex;
+    width:100%;
+    height:64px;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--rule);
+    margin-bottom:14px;
+  }
+  .invoice-bar .seg{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:clamp(10px, 1vw, 11.5px);
+    color:var(--paper);
+    white-space:nowrap;
+    overflow:hidden;
+  }
+  .invoice-bar .seg.sale{ flex:75.75; background:var(--teal); }
+  .invoice-bar .seg.cgst{ flex:12.12; background:var(--brass); }
+  .invoice-bar .seg.sgst{ flex:12.13; background:var(--brass-deep); }
+
+  .invoice-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:26px;
+    font-size:12.5px;
+    margin-bottom:24px;
+  }
+  .invoice-legend .item{display:flex; align-items:center; gap:8px;}
+  .invoice-legend .dot{width:12px; height:12px; border-radius:3px; flex:none;}
+  .invoice-legend .dot.sale{background:var(--teal);}
+  .invoice-legend .dot.tax{background:var(--brass);}
+  .invoice-legend b{font-family:'IBM Plex Mono', monospace;}
+
+  .invoice-verdict{
+    background:rgba(60,114,104,.1);
+    border:1px solid rgba(60,114,104,.35);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:clamp(12.5px, 1.05vw, 13.5px);
+    color:var(--teal-deep);
+  }
+  .invoice-verdict strong{color:var(--ink);}
+
+  /* ---------- GST comparison table ---------- */
+  .tax-table-wrap{margin:0 0 34px; overflow-x:auto;}
+  .tax-table-wrap .section-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-muted);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  .tax-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12.5px;
+    min-width:640px;
+    line-height:1.5;
+  }
+  .tax-table th, .tax-table td{
+    padding:11px 15px;
+    border:1px solid var(--rule);
+    text-align:left;
+    vertical-align:top;
+  }
+  .tax-table thead th{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.05em;
+  }
+  .tax-table thead th:first-child{background:transparent; border:none;}
+  .tax-table tbody td:first-child{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    font-weight:600;
+    color:var(--teal-deep);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    white-space:nowrap;
+    background:var(--paper);
+  }
+  .tax-table tbody td{color:var(--ink);}
+
+  /* ---------- Segment table ---------- */
+  .segment-table-wrap{margin:20px 0 8px; overflow-x:auto;}
+  .segment-table-wrap .section-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-muted);
+    margin:0 0 8px;
+    font-weight:600;
+  }
+  .segment-note{
+    font-size:11.5px;
+    color:var(--ink-muted);
+    margin:0 0 14px;
+    max-width:820px;
+    line-height:1.6;
+  }
+  .segment-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+    min-width:820px;
+  }
+  .segment-table th, .segment-table td{
+    border:1px solid var(--rule);
+    padding:10px 12px;
+    text-align:left;
+    vertical-align:top;
+  }
+  .segment-table thead th{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.03em;
+  }
+  .segment-table thead th:first-child{background:transparent; border:none;}
+  .th-sub{display:block; font-weight:400; opacity:.75; font-size:10px; margin-top:2px;}
+  .segment-table .seg-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    color:var(--ink);
+    background:var(--paper);
+    white-space:nowrap;
+  }
+  .cell-pct{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    margin-bottom:3px;
+  }
+  .cell-brand{
+    font-size:11px;
+    color:var(--ink-muted);
+    margin-bottom:6px;
+    line-height:1.4;
+  }
+  .cell-meta{
+    font-size:10px;
+    color:var(--ink-muted);
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .cell-none{
+    color:var(--ink-muted);
+    text-align:center;
+    font-size:13px;
+  }
+  .cell-none .presence-icon{margin:0 auto 4px;}
+  .cn-label{font-size:10px; display:block; margin-top:2px;}
+  .tag-sub, .tag-assoc{
+    display:inline-block;
+    padding:2px 6px;
+    border-radius:4px;
+    font-weight:600;
+    font-size:9.5px;
+    letter-spacing:.02em;
+  }
+  .tag-sub{background:rgba(60,114,104,.15); color:var(--teal-deep);}
+  .tag-assoc{background:rgba(168,112,58,.15); color:var(--brass-deep);}
+
+  .presence-icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    color:var(--paper);
+    font-size:10px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .presence-icon.no{background:var(--no); color:var(--paper);}
+  .th-dot{
+    display:inline-block;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    margin-right:7px;
+    vertical-align:middle;
+  }
+  .num-cell{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .row-total td{
+    background:var(--ink);
+    color:var(--paper);
+    font-weight:700;
+  }
+  .row-total .seg-name{background:var(--ink); color:var(--paper);}
+  .row-total .num-cell{color:var(--paper);}
+
+  /* ---------- Standalone vs Consolidated ---------- */
+  .std-consol{margin:0 0 34px;}
+  .std-consol .lead{
+    font-size:13.5px;
+    color:var(--ink-muted);
+    max-width:780px;
+    margin:0 0 18px;
+    line-height:1.55;
+  }
+  .sc-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .sc-card{
+    background:var(--paper);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:18px 20px;
+  }
+  .sc-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    margin:0 0 8px;
+    color:var(--ink);
+  }
+  .sc-def{
+    font-size:12.5px;
+    color:var(--ink-muted);
+    margin:0 0 12px;
+    line-height:1.5;
+  }
+  .sc-example{
+    background:rgba(168,112,58,.1);
+    border:1px solid rgba(168,112,58,.3);
+    border-radius:7px;
+    padding:10px 13px;
+    font-size:12px;
+    color:var(--ink);
+    margin:0 0 12px;
+  }
+  .sc-example b{color:var(--brass-deep);}
+  .sc-callout{
+    border-left:3px solid var(--teal);
+    background:rgba(60,114,104,.08);
+    border-radius:0 7px 7px 0;
+    padding:10px 13px;
+    font-size:12px;
+    color:var(--ink);
+    margin:0 0 12px;
+  }
+  .sc-callout b{color:var(--teal-deep);}
+  .sc-when{
+    font-size:12.5px;
+    color:var(--ink);
+    margin:0;
+  }
+  .sc-card.sc-full{margin-bottom:0;}
+  @media (max-width:680px){
+    .sc-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- Line charts ---------- */
+  .chart-wrap{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    padding:18px 16px 12px;
+    margin:14px 0 28px;
+  }
+  .chart-wrap .chart-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    margin:0 0 4px;
+  }
+  .chart-wrap .chart-note{
+    font-size:11px;
+    color:var(--ink-muted);
+    margin:0 0 12px;
+    max-width:680px;
+    line-height:1.5;
+  }
+  .chart-wrap{overflow-x:auto;}
+  .chart-gridline{stroke:var(--rule); stroke-width:1;}
+  .chart-zero{stroke:var(--ink); stroke-width:1.4;}
+  .chart-ytick{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    fill:var(--ink-muted);
+  }
+  .chart-xtick{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    fill:var(--ink-muted);
+  }
+  .chart-line{fill:none; stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round;}
+  .chart-dot{stroke:var(--panel); stroke-width:1;}
+  .chart-legend{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    fill:var(--ink);
+  }
+  @media (max-width:760px){
+    .chart-wrap svg{width:760px;}
+  }
+
+  .control-block{
+    margin-top:30px;
+    padding-top:30px;
+    border-top:1px dashed var(--rule);
+  }
+  .sc-title .alt{
+    font-size:.6em;
+    font-weight:500;
+    color:var(--ink-muted);
+    font-family:'IBM Plex Mono', monospace;
+    text-transform:none;
+    letter-spacing:0;
+    margin-left:6px;
+  }
+
+  /* ---------- Fact points (single-column, one line each) ---------- */
+  .fact-points{
+    list-style:none;
+    margin:0 0 22px;
+    padding:0;
+    border-top:1px solid var(--rule);
+  }
+  .fact-points li{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--rule);
+  }
+  .fp-label{
+    flex:0 0 160px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--teal-deep);
+    font-weight:600;
+  }
+  .fp-value{
+    flex:1;
+    font-size:13px;
+    color:var(--ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  @media (max-width:520px){
+    .fp-label{flex-basis:120px; font-size:9.5px;}
+    .fp-value{white-space:normal;}
+  }
+
+  /* ---------- COGS section head ---------- */
+  .section-head h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:21px;
+    margin:0 0 10px;
+  }
+  .section-head h2 .alt{color:var(--ink-muted); font-weight:500; font-size:.62em; display:block; margin-top:4px;}
+  .section-head p{max-width:620px; color:var(--ink-muted); margin:0 0 34px;}
+
+  /* ---------- Bill of materials grid ---------- */
+  .bom-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+  }
+  .bom-card{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:20px 18px 22px;
+    min-height:170px;
+    display:flex;
+    flex-direction:column;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  @media (prefers-reduced-motion: reduce){ .bom-card{transition:none;} }
+  .bom-card:hover{ transform:translateY(-3px); box-shadow:0 10px 22px -14px rgba(32,38,43,.35); }
+
+  .bom-card .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:13px;
+    color:var(--brass-deep);
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+  .bom-card .num::before{content:"№ ";}
+  .bom-card h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:16.5px;
+    margin:0 0 8px;
+    line-height:1.25;
+  }
+  .bom-card p{
+    font-size:13.8px;
+    color:var(--ink-muted);
+    margin:0;
+    flex:1;
+  }
+  .bom-card .note{
+    margin-top:10px;
+    font-size:12px;
+    font-style:italic;
+    color:var(--teal-deep);
+  }
+
+  .bom-rail{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:34px 0 -6px;
+    color:var(--ink-muted);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.08em;
+  }
+  .bom-rail .line{flex:1; height:1px; background:var(--rule);}
+
+  /* ---------- COGS wheel diagram ---------- */
+  .wheel-wrap{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:16px;
+    padding:20px 16px 16px;
+    margin-bottom:40px;
+  }
+  .wheel-wrap .wheel-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-muted);
+    margin:0 0 4px;
+    font-weight:600;
+  }
+  .wheel-wrap .wheel-note{
+    font-size:11.5px;
+    color:var(--ink-muted);
+    margin:0 0 14px;
+  }
+  .wheel-seg{stroke:var(--panel); stroke-width:3;}
+  .wheel-hub{fill:var(--ink);}
+  .wheel-hub-label{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:22px;
+    fill:var(--paper);
+  }
+  .wheel-hub-sub{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    fill:#B9C0BC;
+  }
+  .wheel-leader{stroke-width:1.4; opacity:.6;}
+  .wheel-label{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12px;
+    fill:var(--ink);
+    font-weight:500;
+  }
+  .wheel-label tspan{font-family:'IBM Plex Mono', monospace; font-size:11px;}
+  @media (max-width:700px){
+    .wheel-wrap{overflow-x:auto;}
+    .wheel-wrap svg{width:700px;}
+  }
+
+  /* ---------- Detail section template ---------- */
+  .detail-section{
+    padding:22px 0;
+    border-top:1px solid var(--rule);
+  }
+  .detail-section:first-of-type{border-top:none; padding-top:0;}
+  .eyebrow-pill{
+    display:inline-block;
+    background:rgba(60,114,104,.12);
+    border:1px solid rgba(60,114,104,.35);
+    color:var(--teal-deep);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:6px;
+    margin-bottom:20px;
+    font-weight:600;
+  }
+  .detail-section h3.headline{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(19px, 2vw, 23px);
+    margin:0 0 14px;
+    line-height:1.05;
+  }
+  .detail-section .sub-dek{
+    font-size:13.5px;
+    color:var(--ink-muted);
+    max-width:700px;
+    margin:0 0 20px;
+    line-height:1.55;
+  }
+  .stat-pill{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    font-weight:600;
+    color:var(--brass-deep);
+    background:rgba(168,112,58,.12);
+    border:1px solid rgba(168,112,58,.35);
+    padding:5px 12px;
+    border-radius:6px;
+    margin-bottom:28px;
+  }
+  .detail-rule{border:none; border-top:2px solid var(--ink); margin:0 0 26px; max-width:760px;}
+  .core-idea{font-size:13.5px; margin:0 0 16px; max-width:760px; color:var(--ink);}
+  .core-idea b{font-weight:700;}
+  .callout-box{
+    border-left:4px solid var(--teal);
+    background:rgba(60,114,104,.08);
+    padding:16px 22px;
+    border-radius:0 8px 8px 0;
+    margin:0 0 26px;
+    max-width:760px;
+    font-size:12.5px;
+    color:var(--ink);
+  }
+  .char-heading{font-weight:700; font-size:13px; margin:0 0 9px;}
+  .char-list{margin:0; padding-left:18px; font-size:13px; color:var(--ink); max-width:760px;}
+  .char-list li{margin-bottom:9px;}
+  .char-list b{font-weight:600;}
+
+  /* ---------- Gross profit strip ---------- */
+  .gp-strip{
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  .gp-strip::after{
+    content:"";
+    position:absolute; right:-60px; top:-60px; width:200px; height:200px;
+    background:radial-gradient(circle, rgba(60,114,104,.35), transparent 70%);
+  }
+  .gp-eq{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:clamp(13.5px, 1.4vw, 15.5px);
+    font-weight:600;
+    margin-bottom:16px;
+    color:#D8D3C4;
+  }
+  .gp-eq strong{color:#8FD9C9;}
+  .gp-strip h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:18px;
+    margin:0 0 12px;
+    color:var(--paper);
+  }
+  .gp-strip p{
+    max-width:660px;
+    color:#B9C0BC;
+    margin:0 0 14px;
+    font-size:12.5px;
+  }
+  .gp-strip p:last-child{margin-bottom:0;}
+  .gp-strip .callout{
+    color:#8FD9C9;
+    font-weight:600;
+  }
+
+  .year-rail{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:22px;
+  }
+  .year-rail span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:#8B9490;
+    border:1px dashed #3E4A47;
+    border-radius:6px;
+    padding:4px 8px;
+  }
+
+  @media (max-width:880px){
+    .bom-grid{grid-template-columns:repeat(2, 1fr);}
+  }
+  @media (max-width:560px){
+    .page{padding:44px 18px 72px;}
+    .bom-grid{grid-template-columns:1fr;}
+    .revenue-card, .gp-strip{padding:28px 22px;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Income Statement</h1>
+  </header>
+
+  <section class="revenue-block">
+    <div class="revenue-card">
+      <h2>Revenue <span class="alt">also called Sales, Turnover, Top Line</span></h2>
+
+      <p class="big">Revenue is the total amount of money a business brings in from selling its goods or services. It's often called the "top line" because it sits at the very top of the income statement — and it excludes any tax collected on behalf of the government, such as CGST, SGST or IGST.</p>
+
+      <div class="tax-table-wrap">
+        <p class="section-label">GST components at a glance</p>
+        <table class="tax-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>CGST</th>
+              <th>SGST</th>
+              <th>IGST</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Full form</td>
+              <td>Central GST</td>
+              <td>State GST</td>
+              <td>Integrated GST</td>
+            </tr>
+            <tr>
+              <td>Collected by</td>
+              <td>The Central Government of India</td>
+              <td>The respective State Government where consumption happens (UTGST for Union Territories without their own legislature, like Andaman &amp; Nicobar or Lakshadweep)</td>
+              <td>The Central Government, which then shares a portion with the destination state</td>
+            </tr>
+            <tr>
+              <td>Applies to</td>
+              <td>Intra-state transactions — sales happening within the same state</td>
+              <td>Intra-state transactions, applied alongside CGST on the same sale</td>
+              <td>Inter-state transactions — sales between two different states or union territories — and imports into India</td>
+            </tr>
+            <tr>
+              <td>Example</td>
+              <td>A factory in Mumbai sells machinery to a buyer in Mumbai — the Central Government collects CGST</td>
+              <td>On that same Mumbai machinery sale, the Maharashtra State Government collects SGST</td>
+              <td>A factory in Karnataka sells machinery to a buyer in Tamil Nadu — a single tax called IGST is levied</td>
+            </tr>
+            <tr>
+              <td>Rate (illustrative)</td>
+              <td>9%</td>
+              <td>9%</td>
+              <td>18%</td>
+            </tr>
+            <tr>
+              <td>Settlement</td>
+              <td>Stays with the Central Government — no settlement needed</td>
+              <td>Stays with the State Government — no settlement needed</td>
+              <td>The Centre collects the full 18%, then settles roughly 9% of it back to Tamil Nadu (the destination state) — the same share Tamil Nadu would have collected as SGST had it been an intra-state sale</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="std-consol">
+        <p class="lead">Revenue can be reported as both standalone and consolidated if a company owns other businesses. The choice between the two depends entirely on whether you're looking at the core parent business by itself, or the entire corporate group as a single entity.</p>
+
+        <div class="sc-card sc-full">
+          <p class="sc-title">Standalone Revenue</p>
+          <p class="sc-def">Reflects the money generated solely by the parent company as an independent legal entity. It completely excludes the earnings of any smaller companies it owns.</p>
+          <div class="sc-example"><b>Example.</b> If a major tech parent company generates ₹10,000 crores from its primary digital services, its standalone revenue is exactly ₹10,000 crores.</div>
+          <p class="sc-when"><b>When to use it:</b> to evaluate how the main, core business is performing on its own legs, without help from its child companies.</p>
+        </div>
+
+        <div class="chart-wrap">
+          <p class="chart-title">Standalone revenue, FY 2013-14 to FY 2025-26</p>
+          <p class="chart-note">Core domestic manufacturing operations only, ₹ crores. Two-wheeler makers vs. Bajaj (also two-wheelers plus a large three-wheeler business).</p>
+          <svg width="100%" viewBox="0 0 820 460" role="img" aria-label="Line chart of standalone revenue for Hero, Eicher, TVS and Bajaj from 2013-14 to 2025-26">
+        <g transform="translate(66,14)"><circle cx="4" cy="0" r="4" fill="var(--c-hero)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Hero</text></g><g transform="translate(216,14)"><rect x="0.6000000000000001" y="-3.4" width="6.8" height="6.8" fill="var(--c-eicher)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Eicher</text></g><g transform="translate(366,14)"><polygon points="4,-4.6 -0.5999999999999996,3.4499999999999997 8.6,3.4499999999999997" fill="var(--c-tvs)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">TVS</text></g><g transform="translate(516,14)"><polygon points="4,-4 8,0 4,4 0,0" fill="var(--c-bajaj)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Bajaj</text></g>
+        <line class="chart-gridline chart-zero" x1="66" y1="418.0" x2="804" y2="418.0"/>
+        <text class="chart-ytick" x="56" y="418.0" text-anchor="end" dominant-baseline="central">0</text>
+        <line class="chart-gridline" x1="66" y1="354.0" x2="804" y2="354.0"/>
+        <text class="chart-ytick" x="56" y="354.0" text-anchor="end" dominant-baseline="central">10,000</text>
+        <line class="chart-gridline" x1="66" y1="290.0" x2="804" y2="290.0"/>
+        <text class="chart-ytick" x="56" y="290.0" text-anchor="end" dominant-baseline="central">20,000</text>
+        <line class="chart-gridline" x1="66" y1="226.0" x2="804" y2="226.0"/>
+        <text class="chart-ytick" x="56" y="226.0" text-anchor="end" dominant-baseline="central">30,000</text>
+        <line class="chart-gridline" x1="66" y1="162.0" x2="804" y2="162.0"/>
+        <text class="chart-ytick" x="56" y="162.0" text-anchor="end" dominant-baseline="central">40,000</text>
+        <line class="chart-gridline" x1="66" y1="98.0" x2="804" y2="98.0"/>
+        <text class="chart-ytick" x="56" y="98.0" text-anchor="end" dominant-baseline="central">50,000</text>
+        <line class="chart-gridline" x1="66" y1="34.0" x2="804" y2="34.0"/>
+        <text class="chart-ytick" x="56" y="34.0" text-anchor="end" dominant-baseline="central">60,000</text>
+        <text class="chart-xtick" x="66.0" y="436" text-anchor="middle">2013-14</text>
+        <text class="chart-xtick" x="127.5" y="436" text-anchor="middle">2014-15</text>
+        <text class="chart-xtick" x="189.0" y="436" text-anchor="middle">2015-16</text>
+        <text class="chart-xtick" x="250.5" y="436" text-anchor="middle">2016-17</text>
+        <text class="chart-xtick" x="312.0" y="436" text-anchor="middle">2017-18</text>
+        <text class="chart-xtick" x="373.5" y="436" text-anchor="middle">2018-19</text>
+        <text class="chart-xtick" x="435.0" y="436" text-anchor="middle">2019-20</text>
+        <text class="chart-xtick" x="496.5" y="436" text-anchor="middle">2020-21</text>
+        <text class="chart-xtick" x="558.0" y="436" text-anchor="middle">2021-22</text>
+        <text class="chart-xtick" x="619.5" y="436" text-anchor="middle">2022-23</text>
+        <text class="chart-xtick" x="681.0" y="436" text-anchor="middle">2023-24</text>
+        <text class="chart-xtick" x="742.5" y="436" text-anchor="middle">2024-25</text>
+        <text class="chart-xtick" x="804.0" y="436" text-anchor="middle">2025-26</text>
+        <polyline class="chart-line" points="66.0,257.2 127.5,243.0 189.0,237.8 250.5,235.6 312.0,211.7 373.5,202.6 435.0,233.4 496.5,220.9 558.0,230.8 619.5,201.6 681.0,178.3 742.5,157.2 804.0,118.3" stroke="var(--c-hero)"/>
+        <circle class="chart-dot" cx="66.0" cy="257.2" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="127.5" cy="243.0" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="189.0" cy="237.8" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="250.5" cy="235.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="312.0" cy="211.7" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="373.5" cy="202.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="435.0" cy="233.4" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="496.5" cy="220.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="558.0" cy="230.8" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="619.5" cy="201.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="681.0" cy="178.3" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="742.5" cy="157.2" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="804.0" cy="118.3" r="3.4" fill="var(--c-hero)"/>
+        <polyline class="chart-line" points="66.0,407.1 127.5,398.6 189.0,384.6 250.5,373.0 312.0,360.7 373.5,355.3 435.0,359.9 496.5,362.8 558.0,353.2 619.5,328.0 681.0,315.1 742.5,299.4 804.0,272.7" stroke="var(--c-eicher)"/>
+        <rect class="chart-dot" x="63.1" y="404.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="124.6" y="395.7" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="186.1" y="381.7" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="247.6" y="370.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="309.1" y="357.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="370.6" y="352.4" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="432.1" y="357.0" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="493.6" y="359.9" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="555.1" y="350.3" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="616.6" y="325.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="678.1" y="312.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="739.6" y="296.5" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="801.1" y="269.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <polyline class="chart-line" points="66.0,367.0 127.5,353.4 189.0,346.0 250.5,340.3 312.0,322.2 373.5,303.4 435.0,315.1 496.5,310.8 558.0,284.9 619.5,249.2 681.0,216.4 742.5,189.6 804.0,123.2" stroke="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="66.0,360.6 59.5,371.9 72.5,371.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="127.5,346.9 121.0,358.2 134.0,358.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="189.0,339.6 182.5,350.9 195.5,350.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="250.5,333.9 244.0,345.2 257.0,345.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="312.0,315.8 305.5,327.1 318.5,327.1" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="373.5,296.9 367.0,308.2 380.0,308.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="435.0,308.7 428.5,320.0 441.5,320.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="496.5,304.3 490.0,315.6 503.0,315.6" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="558.0,278.5 551.5,289.8 564.5,289.8" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="619.5,242.7 613.0,254.0 626.0,254.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="681.0,209.9 674.5,221.2 687.5,221.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="742.5,183.1 736.0,194.4 749.0,194.4" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="804.0,116.8 797.5,128.1 810.5,128.1" fill="var(--c-tvs)"/>
+        <polyline class="chart-line" points="66.0,289.0 127.5,279.7 189.0,275.6 250.5,281.2 312.0,259.9 373.5,228.8 435.0,231.7 496.5,244.3 558.0,212.3 619.5,191.7 681.0,139.1 742.5,109.2 804.0,40.4" stroke="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="66.0,283.6 71.4,289.0 66.0,294.5 60.6,289.0" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="127.5,274.2 132.9,279.7 127.5,285.1 122.1,279.7" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="189.0,270.1 194.4,275.6 189.0,281.0 183.6,275.6" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="250.5,275.8 255.9,281.2 250.5,286.6 245.1,281.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="312.0,254.5 317.4,259.9 312.0,265.4 306.6,259.9" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="373.5,223.3 378.9,228.8 373.5,234.2 368.1,228.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="435.0,226.2 440.4,231.7 435.0,237.1 429.6,231.7" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="496.5,238.9 501.9,244.3 496.5,249.8 491.1,244.3" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="558.0,206.9 563.4,212.3 558.0,217.8 552.6,212.3" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="619.5,186.3 624.9,191.7 619.5,197.1 614.1,191.7" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="681.0,133.7 686.4,139.1 681.0,144.5 675.6,139.1" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="742.5,103.8 747.9,109.2 742.5,114.7 737.1,109.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="804.0,35.0 809.4,40.4 804.0,45.8 798.6,40.4" fill="var(--c-bajaj)"/>
+      </svg>
+        </div>
+
+        <div class="sc-card sc-full">
+          <p class="sc-title">Consolidated Revenue</p>
+          <p class="sc-def">Shows the combined total money brought in by the parent company plus all of its subsidiaries, joint ventures, and associate businesses.</p>
+          <div class="sc-callout"><b>The catch — intercompany eliminations.</b> If the parent company sells ₹1,000 crores of goods to its own subsidiary, that inner-group transaction is deleted from the consolidated statement. This prevents the group from artificially inflating its sales figures.</div>
+          <div class="sc-example"><b>Example.</b> If the tech parent generates ₹10,000 crores and its retail subsidiary brings in ₹5,000 crores from external customers, consolidated revenue is ₹15,000 crores.</div>
+          <p class="sc-when"><b>When to use it:</b> when evaluating a stock — it gives the true, complete financial picture of the entire corporate group.</p>
+        </div>
+
+        <div class="chart-wrap">
+          <p class="chart-title">Consolidated revenue, FY 2013-14 to FY 2025-26</p>
+          <p class="chart-note">Parent plus subsidiaries, joint ventures and associates, ₹ crores. Same y-axis scale as the standalone chart above, for direct comparison.</p>
+          <svg width="100%" viewBox="0 0 820 460" role="img" aria-label="Line chart of consolidated revenue for Hero, Eicher, TVS and Bajaj from 2013-14 to 2025-26">
+        <g transform="translate(66,14)"><circle cx="4" cy="0" r="4" fill="var(--c-hero)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Hero</text></g><g transform="translate(216,14)"><rect x="0.6000000000000001" y="-3.4" width="6.8" height="6.8" fill="var(--c-eicher)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Eicher</text></g><g transform="translate(366,14)"><polygon points="4,-4.6 -0.5999999999999996,3.4499999999999997 8.6,3.4499999999999997" fill="var(--c-tvs)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">TVS</text></g><g transform="translate(516,14)"><polygon points="4,-4 8,0 4,4 0,0" fill="var(--c-bajaj)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Bajaj</text></g>
+        <line class="chart-gridline chart-zero" x1="66" y1="418.0" x2="804" y2="418.0"/>
+        <text class="chart-ytick" x="56" y="418.0" text-anchor="end" dominant-baseline="central">0</text>
+        <line class="chart-gridline" x1="66" y1="363.1" x2="804" y2="363.1"/>
+        <text class="chart-ytick" x="56" y="363.1" text-anchor="end" dominant-baseline="central">10,000</text>
+        <line class="chart-gridline" x1="66" y1="308.3" x2="804" y2="308.3"/>
+        <text class="chart-ytick" x="56" y="308.3" text-anchor="end" dominant-baseline="central">20,000</text>
+        <line class="chart-gridline" x1="66" y1="253.4" x2="804" y2="253.4"/>
+        <text class="chart-ytick" x="56" y="253.4" text-anchor="end" dominant-baseline="central">30,000</text>
+        <line class="chart-gridline" x1="66" y1="198.6" x2="804" y2="198.6"/>
+        <text class="chart-ytick" x="56" y="198.6" text-anchor="end" dominant-baseline="central">40,000</text>
+        <line class="chart-gridline" x1="66" y1="143.7" x2="804" y2="143.7"/>
+        <text class="chart-ytick" x="56" y="143.7" text-anchor="end" dominant-baseline="central">50,000</text>
+        <line class="chart-gridline" x1="66" y1="88.9" x2="804" y2="88.9"/>
+        <text class="chart-ytick" x="56" y="88.9" text-anchor="end" dominant-baseline="central">60,000</text>
+        <line class="chart-gridline" x1="66" y1="34.0" x2="804" y2="34.0"/>
+        <text class="chart-ytick" x="56" y="34.0" text-anchor="end" dominant-baseline="central">70,000</text>
+        <text class="chart-xtick" x="66.0" y="436" text-anchor="middle">2013-14</text>
+        <text class="chart-xtick" x="127.5" y="436" text-anchor="middle">2014-15</text>
+        <text class="chart-xtick" x="189.0" y="436" text-anchor="middle">2015-16</text>
+        <text class="chart-xtick" x="250.5" y="436" text-anchor="middle">2016-17</text>
+        <text class="chart-xtick" x="312.0" y="436" text-anchor="middle">2017-18</text>
+        <text class="chart-xtick" x="373.5" y="436" text-anchor="middle">2018-19</text>
+        <text class="chart-xtick" x="435.0" y="436" text-anchor="middle">2019-20</text>
+        <text class="chart-xtick" x="496.5" y="436" text-anchor="middle">2020-21</text>
+        <text class="chart-xtick" x="558.0" y="436" text-anchor="middle">2021-22</text>
+        <text class="chart-xtick" x="619.5" y="436" text-anchor="middle">2022-23</text>
+        <text class="chart-xtick" x="681.0" y="436" text-anchor="middle">2023-24</text>
+        <text class="chart-xtick" x="742.5" y="436" text-anchor="middle">2024-25</text>
+        <text class="chart-xtick" x="804.0" y="436" text-anchor="middle">2025-26</text>
+        <polyline class="chart-line" points="66.0,279.3 127.5,266.9 189.0,262.3 250.5,261.1 312.0,241.2 373.5,231.6 435.0,257.5 496.5,248.2 558.0,255.9 619.5,230.6 681.0,210.7 742.5,193.5 804.0,157.9" stroke="var(--c-hero)"/>
+        <circle class="chart-dot" cx="66.0" cy="279.3" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="127.5" cy="266.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="189.0" cy="262.3" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="250.5" cy="261.1" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="312.0" cy="241.2" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="373.5" cy="231.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="435.0" cy="257.5" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="496.5" cy="248.2" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="558.0" cy="255.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="619.5" cy="230.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="681.0" cy="210.7" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="742.5" cy="193.5" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="804.0" cy="157.9" r="3.4" fill="var(--c-hero)"/>
+        <polyline class="chart-line" points="66.0,380.6 127.5,370.1 189.0,389.4 250.5,379.4 312.0,368.8 373.5,364.3 435.0,367.8 496.5,370.2 558.0,361.5 619.5,339.2 681.0,327.2 742.5,314.7 804.0,289.6" stroke="var(--c-eicher)"/>
+        <rect class="chart-dot" x="63.1" y="377.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="124.6" y="367.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="186.1" y="386.5" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="247.6" y="376.5" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="309.1" y="365.9" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="370.6" y="361.4" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="432.1" y="364.9" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="493.6" y="367.3" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="555.1" y="358.6" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="616.6" y="336.3" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="678.1" y="324.3" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="739.6" y="311.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="801.1" y="286.7" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <polyline class="chart-line" points="66.0,370.3 127.5,360.0 189.0,354.9 250.5,349.4 312.0,334.2 373.5,318.1 435.0,327.7 496.5,326.1 558.0,302.8 619.5,272.7 681.0,242.9 742.5,219.4 804.0,158.9" stroke="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="66.0,363.8 59.5,375.2 72.5,375.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="127.5,353.5 121.0,364.8 134.0,364.8" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="189.0,348.5 182.5,359.8 195.5,359.8" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="250.5,343.0 244.0,354.3 257.0,354.3" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="312.0,327.7 305.5,339.1 318.5,339.1" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="373.5,311.6 367.0,322.9 380.0,322.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="435.0,321.3 428.5,332.6 441.5,332.6" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="496.5,319.7 490.0,331.0 503.0,331.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="558.0,296.3 551.5,307.6 564.5,307.6" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="619.5,266.3 613.0,277.6 626.0,277.6" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="681.0,236.4 674.5,247.7 687.5,247.7" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="742.5,212.9 736.0,224.2 749.0,224.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="804.0,152.4 797.5,163.7 810.5,163.7" fill="var(--c-tvs)"/>
+        <polyline class="chart-line" points="66.0,307.4 127.5,299.4 189.0,292.0 250.5,297.2 312.0,277.8 373.5,243.5 435.0,245.5 496.5,265.8 558.0,236.2 619.5,218.2 681.0,172.9 742.5,138.3 804.0,72.9" stroke="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="66.0,302.0 71.4,307.4 66.0,312.9 60.6,307.4" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="127.5,294.0 132.9,299.4 127.5,304.9 122.1,299.4" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="189.0,286.6 194.4,292.0 189.0,297.4 183.6,292.0" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="250.5,291.7 255.9,297.2 250.5,302.6 245.1,297.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="312.0,272.3 317.4,277.8 312.0,283.2 306.6,277.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="373.5,238.1 378.9,243.5 373.5,249.0 368.1,243.5" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="435.0,240.1 440.4,245.5 435.0,251.0 429.6,245.5" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="496.5,260.4 501.9,265.8 496.5,271.3 491.1,265.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="558.0,230.7 563.4,236.2 558.0,241.6 552.6,236.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="619.5,212.7 624.9,218.2 619.5,223.6 614.1,218.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="681.0,167.4 686.4,172.9 681.0,178.3 675.6,172.9" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="742.5,132.8 747.9,138.3 742.5,143.7 737.1,138.3" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="804.0,67.5 809.4,72.9 804.0,78.4 798.6,72.9" fill="var(--c-bajaj)"/>
+      </svg>
+        </div>
+
+        <div class="control-block">
+          <span class="eyebrow-pill">Common misconception</span>
+          <h3 class="headline">Why Consolidated Revenue Isn't a Simple Sum</h3>
+          <p class="sub-dek">You might expect Consolidated Revenue to be every sale from every company a parent has invested in, added together. It isn't — accounting rules strictly forbid that unless the parent has total control. Here's why a parent can own a huge chunk of a successful startup, yet show <b>₹0</b> of that startup's sales in its Consolidated Revenue.</p>
+
+          <p class="core-idea"><b>1. The rule of control — over 50% vs. under 50%.</b> The accounting world splits investments into two categories, based strictly on who runs the show.</p>
+
+          <div class="sc-grid">
+            <div class="sc-card">
+              <p class="sc-title">Subsidiary <span class="alt">&gt; 50% owned</span></p>
+              <p class="sc-def">The parent owns more than half the business, so it has full control and calls all the shots.</p>
+              <div class="sc-example"><b>Rule.</b> 100% of the subsidiary's revenue and expenses get added directly into the parent's Consolidated Revenue, line by line.</div>
+            </div>
+            <div class="sc-card">
+              <p class="sc-title">Associate <span class="alt">20–50% owned</span></p>
+              <p class="sc-def">The parent holds a large stake — say, a 34% stake in a company like Euler Motors — but not control. This counts as "significant influence" only.</p>
+              <div class="sc-example"><b>Rule.</b> The associate is never line-by-line consolidated — see below.</div>
+            </div>
+          </div>
+
+          <p class="core-idea"><b>2. The "one-line" rule for associates.</b> For an associate, accountants use the <b>Equity Method</b>. Under it, the parent is completely banned from touching the associate's top-line revenue — even if that associate makes thousands of crores in sales, not a single rupee is added to the parent's Consolidated Revenue. Instead, the parent looks only at the associate's very last number — its Net Profit or Net Loss — works out its exact ownership share of that number, and drops it onto a single line at the bottom of its own report, labeled <b>"Share of Profit/Loss of Associates."</b></p>
+
+          <p class="core-idea"><b>3. How this plays out in the numbers.</b> Many high-growth tech and EV companies spend heavily on factories and R&amp;D, so they often run at a net loss in their early years. Because of the two rules above, that shows up in the parent's books like this:</p>
+          <ul class="char-list">
+            <li><b>Zero revenue boost</b> — the parent's Consolidated Revenue looks small, because the associate's massive sales figures are left out completely</li>
+            <li><b>A hit to profits</b> — if the associate loses money, the parent must subtract its ownership share of that loss (for example, ₹107.79 crores) directly from its own Consolidated Net Profit</li>
+          </ul>
+
+          <div class="callout-box"><b>Summary.</b> If a parent doesn't own more than half (&gt;50%) of a business, it can't claim that business's sales as its own. It can only reflect its share of the final net profit or loss, as a single line at the very bottom of the page.</div>
+
+          <div class="chart-wrap">
+            <p class="chart-title">The gap: consolidated minus standalone, FY 2013-14 to FY 2025-26</p>
+            <p class="chart-note">₹ crores. This is the direct revenue footprint of subsidiaries, overseas operations, and captive financing — the part standalone figures never show. Eicher's outsized gap in FY14–15 is worth digging into against its actual annual report before drawing conclusions — a swing that large and specific usually traces back to how a joint venture or subsidiary was accounted for that year.</p>
+            <svg width="100%" viewBox="0 0 820 460" role="img" aria-label="Line chart of the gap between consolidated and standalone revenue for Hero, Eicher, TVS and Bajaj from 2013-14 to 2025-26">
+        <g transform="translate(66,14)"><circle cx="4" cy="0" r="4" fill="var(--c-hero)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Hero</text></g><g transform="translate(216,14)"><rect x="0.6000000000000001" y="-3.4" width="6.8" height="6.8" fill="var(--c-eicher)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Eicher</text></g><g transform="translate(366,14)"><polygon points="4,-4.6 -0.5999999999999996,3.4499999999999997 8.6,3.4499999999999997" fill="var(--c-tvs)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">TVS</text></g><g transform="translate(516,14)"><polygon points="4,-4 8,0 4,4 0,0" fill="var(--c-bajaj)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Bajaj</text></g>
+        <line class="chart-gridline" x1="66" y1="418.0" x2="804" y2="418.0"/>
+        <text class="chart-ytick" x="56" y="418.0" text-anchor="end" dominant-baseline="central">-1,000</text>
+        <line class="chart-gridline chart-zero" x1="66" y1="363.1" x2="804" y2="363.1"/>
+        <text class="chart-ytick" x="56" y="363.1" text-anchor="end" dominant-baseline="central">0</text>
+        <line class="chart-gridline" x1="66" y1="308.3" x2="804" y2="308.3"/>
+        <text class="chart-ytick" x="56" y="308.3" text-anchor="end" dominant-baseline="central">1,000</text>
+        <line class="chart-gridline" x1="66" y1="253.4" x2="804" y2="253.4"/>
+        <text class="chart-ytick" x="56" y="253.4" text-anchor="end" dominant-baseline="central">2,000</text>
+        <line class="chart-gridline" x1="66" y1="198.6" x2="804" y2="198.6"/>
+        <text class="chart-ytick" x="56" y="198.6" text-anchor="end" dominant-baseline="central">3,000</text>
+        <line class="chart-gridline" x1="66" y1="143.7" x2="804" y2="143.7"/>
+        <text class="chart-ytick" x="56" y="143.7" text-anchor="end" dominant-baseline="central">4,000</text>
+        <line class="chart-gridline" x1="66" y1="88.9" x2="804" y2="88.9"/>
+        <text class="chart-ytick" x="56" y="88.9" text-anchor="end" dominant-baseline="central">5,000</text>
+        <line class="chart-gridline" x1="66" y1="34.0" x2="804" y2="34.0"/>
+        <text class="chart-ytick" x="56" y="34.0" text-anchor="end" dominant-baseline="central">6,000</text>
+        <text class="chart-xtick" x="66.0" y="436" text-anchor="middle">2013-14</text>
+        <text class="chart-xtick" x="127.5" y="436" text-anchor="middle">2014-15</text>
+        <text class="chart-xtick" x="189.0" y="436" text-anchor="middle">2015-16</text>
+        <text class="chart-xtick" x="250.5" y="436" text-anchor="middle">2016-17</text>
+        <text class="chart-xtick" x="312.0" y="436" text-anchor="middle">2017-18</text>
+        <text class="chart-xtick" x="373.5" y="436" text-anchor="middle">2018-19</text>
+        <text class="chart-xtick" x="435.0" y="436" text-anchor="middle">2019-20</text>
+        <text class="chart-xtick" x="496.5" y="436" text-anchor="middle">2020-21</text>
+        <text class="chart-xtick" x="558.0" y="436" text-anchor="middle">2021-22</text>
+        <text class="chart-xtick" x="619.5" y="436" text-anchor="middle">2022-23</text>
+        <text class="chart-xtick" x="681.0" y="436" text-anchor="middle">2023-24</text>
+        <text class="chart-xtick" x="742.5" y="436" text-anchor="middle">2024-25</text>
+        <text class="chart-xtick" x="804.0" y="436" text-anchor="middle">2025-26</text>
+        <polyline class="chart-line" points="66.0,354.9 127.5,352.9 189.0,351.3 250.5,357.7 312.0,363.1 373.5,345.5 435.0,340.1 496.5,354.5 558.0,346.3 619.5,343.8 681.0,344.9 742.5,354.0 804.0,331.3" stroke="var(--c-hero)"/>
+        <circle class="chart-dot" cx="66.0" cy="354.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="127.5" cy="352.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="189.0" cy="351.3" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="250.5" cy="357.7" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="312.0" cy="363.1" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="373.5" cy="345.5" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="435.0" cy="340.1" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="496.5" cy="354.5" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="558.0" cy="346.3" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="619.5" cy="343.8" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="681.0" cy="344.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="742.5" cy="354.0" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="804.0" cy="331.3" r="3.4" fill="var(--c-hero)"/>
+        <polyline class="chart-line" points="66.0,83.0 127.5,50.1 189.0,363.8 250.5,363.4 312.0,362.7 373.5,363.0 435.0,359.0 496.5,357.6 558.0,353.5 619.5,347.2 681.0,337.4 742.5,347.2 804.0,324.3" stroke="var(--c-eicher)"/>
+        <rect class="chart-dot" x="63.1" y="80.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="124.6" y="47.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="186.1" y="361.0" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="247.6" y="360.5" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="309.1" y="359.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="370.6" y="360.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="432.1" y="356.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="493.6" y="354.7" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="555.1" y="350.6" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="616.6" y="344.3" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="678.1" y="334.5" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="739.6" y="344.4" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="801.1" y="321.4" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <polyline class="chart-line" points="66.0,323.2 127.5,337.0 189.0,349.1 250.5,343.1 312.0,346.3 373.5,346.4 435.0,342.2 496.5,363.1 558.0,351.7 619.5,357.6 681.0,340.0 742.5,334.8 804.0,298.4" stroke="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="66.0,316.7 59.5,328.0 72.5,328.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="127.5,330.5 121.0,341.9 134.0,341.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="189.0,342.6 182.5,353.9 195.5,353.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="250.5,336.7 244.0,348.0 257.0,348.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="312.0,339.8 305.5,351.1 318.5,351.1" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="373.5,340.0 367.0,351.3 380.0,351.3" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="435.0,335.7 428.5,347.0 441.5,347.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="496.5,356.7 490.0,368.0 503.0,368.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="558.0,345.2 551.5,356.5 564.5,356.5" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="619.5,351.1 613.0,362.5 626.0,362.5" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="681.0,333.5 674.5,344.8 687.5,344.8" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="742.5,328.3 736.0,339.6 749.0,339.6" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="804.0,291.9 797.5,303.2 810.5,303.2" fill="var(--c-tvs)"/>
+        <polyline class="chart-line" points="66.0,362.7 127.5,363.0 189.0,324.0 250.5,327.4 312.0,315.8 373.5,240.4 435.0,235.3 496.5,329.8 558.0,307.8 619.5,304.5 681.0,302.5 742.5,212.4 804.0,148.9" stroke="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="66.0,357.2 71.4,362.7 66.0,368.1 60.6,362.7" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="127.5,357.6 132.9,363.0 127.5,368.5 122.1,363.0" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="189.0,318.5 194.4,324.0 189.0,329.4 183.6,324.0" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="250.5,321.9 255.9,327.4 250.5,332.8 245.1,327.4" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="312.0,310.3 317.4,315.8 312.0,321.2 306.6,315.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="373.5,234.9 378.9,240.4 373.5,245.8 368.1,240.4" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="435.0,229.8 440.4,235.3 435.0,240.7 429.6,235.3" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="496.5,324.3 501.9,329.8 496.5,335.2 491.1,329.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="558.0,302.4 563.4,307.8 558.0,313.2 552.6,307.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="619.5,299.1 624.9,304.5 619.5,309.9 614.1,304.5" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="681.0,297.0 686.4,302.5 681.0,307.9 675.6,302.5" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="742.5,207.0 747.9,212.4 742.5,217.9 737.1,212.4" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="804.0,143.5 809.4,148.9 804.0,154.4 798.6,148.9" fill="var(--c-bajaj)"/>
+      </svg>
+          </div>
+        </div>
+
+      </div>
+
+            <div class="segment-table-wrap">
+        <p class="section-label">Revenue by segment, FY26</p>
+        <p class="segment-note"> = segment present &nbsp; <span class="presence-icon no" style="display:inline-flex;">&#10005;</span> = not present. <span class="tag-sub">Subsidiary</span> = fully consolidated line-by-line. <span class="tag-assoc">Associate</span> = equity method, excluded from revenue.</p>
+        <table class="segment-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th><span class="th-dot" style="background:var(--c-hero)"></span>Hero MotoCorp</th>
+              <th><span class="th-dot" style="background:var(--c-eicher)"></span>Eicher Motors <span class="th-sub">(Royal Enfield)</span></th>
+              <th><span class="th-dot" style="background:var(--c-tvs)"></span>TVS Motor Company</th>
+              <th><span class="th-dot" style="background:var(--c-bajaj)"></span>Bajaj Auto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="seg-name">Two-Wheelers (ICE)</td>
+              <td><div class="cell-pct">85.80%</div><div class="cell-brand">Splendor, HF Deluxe, Glamour</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">85.69%</div><div class="cell-brand">Royal Enfield (Classic, Hunter)</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">78.93%</div><div class="cell-brand">Apache, Jupiter, Raider, XL100</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">75.49%</div><div class="cell-brand">Pulsar, Platina, KTM, Triumph</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+            </tr>
+            <tr>
+              <td class="seg-name">Electric Two-Wheelers</td>
+              <td><div class="cell-pct">1.80%</div><div class="cell-brand">VIDA (V1 Pro, V2 Pro)</div><div class="cell-meta">Since <b>2022</b> &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">0.00% (Pre-sales)</div><div class="cell-brand">Flying Flea (FF.C6, FF.S6)</div><div class="cell-meta">Since <b>2025</b> &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">5.50%</div><div class="cell-brand">iQube, TVS X, TVS Orbiter</div><div class="cell-meta">Since 2020 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">3.80%</div><div class="cell-brand">Chetak EV</div><div class="cell-meta">Since 2020 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+            </tr>
+            <tr>
+              <td class="seg-name">Three-Wheelers (ICE & EV)</td>
+              <td><div class="cell-pct">0.00%</div><div class="cell-brand">Euler Motors, Surge S32</div><div class="cell-meta">Since <b>2024</b> &middot; <span class="tag-assoc">Associate</span></div></td>
+              <td class="cell-none"><span class="presence-icon no">&#10005;</span><span class="cn-label">Not present</span></td>
+              <td><div class="cell-pct">5.20%</div><div class="cell-brand">TVS King (Duramax, EV Max)</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">6.45%</div><div class="cell-brand">Maxima, RE Passenger, EV 3W</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+            </tr>
+            <tr>
+              <td class="seg-name">Four-Wheelers / SCVs / Trucks</td>
+              <td><div class="cell-pct">0.00%</div><div class="cell-brand">Euler Storm EV / Turbo EV</div><div class="cell-meta">Since <b>2024</b> &middot; <span class="tag-assoc">Associate</span></div></td>
+              <td><div class="cell-pct">0.00%</div><div class="cell-brand">VECV Joint Venture (Eicher, Volvo)</div><div class="cell-meta">Since <2015 &middot; <span class="tag-assoc">Associate</span></div></td>
+              <td class="cell-none"><span class="presence-icon no">&#10005;</span><span class="cn-label">Not present</span></td>
+              <td><div class="cell-pct">0.50%</div><div class="cell-brand">Bajaj Qute (Quadricycle)</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+            </tr>
+            <tr>
+              <td class="seg-name">Captive Financial Services</td>
+              <td><div class="cell-pct">0.00%</div><div class="cell-brand">Hero FinCorp Limited</div><div class="cell-meta">Since <2015 &middot; <span class="tag-assoc">Associate</span></div></td>
+              <td><div class="cell-pct">0.00%</div><div class="cell-brand">Volvo Financial Services India</div><div class="cell-meta">Since <b>2025</b> &middot; <span class="tag-assoc">Associate</span></div></td>
+              <td><div class="cell-pct">0.00%</div><div class="cell-brand">TVS Credit Services (TVS CS)</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">5.16%</div><div class="cell-brand">Bajaj Auto Credit Limited (BACL)</div><div class="cell-meta">Since <b>2024</b> &middot; <span class="tag-sub">Subsidiary</span></div></td>
+            </tr>
+            <tr>
+              <td class="seg-name">Spares, Accessories & Apparel</td>
+              <td><div class="cell-pct">13.00%</div><div class="cell-brand">PAM (Genuine Spares, PROPARTS)</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">14.31%</div><div class="cell-brand">RE Apparel, Accessories, REOWN</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">10.41%</div><div class="cell-brand">TVS Genuine Parts, DriveX</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+              <td><div class="cell-pct">9.10%</div><div class="cell-brand">Bajaj Genuine Spares, Yulu Fleet</div><div class="cell-meta">Since <2015 &middot; <span class="tag-sub">Subsidiary</span></div></td>
+            </tr>
+            <tr>
+              <td class="seg-name">Adjustments &amp; Eliminations <span class="th-sub">(intercompany)</span></td>
+              <td class="num-cell">-0.60%</td>
+              <td class="num-cell">0.00% (Net)</td>
+              <td class="num-cell">-0.04%</td>
+              <td class="num-cell">-0.50% (Net)</td>
+            </tr>
+            <tr class="row-total">
+              <td class="seg-name">Exact FY26 revenue <span class="th-sub">(₹ crores)</span></td>
+              <td class="num-cell">₹47,411.24</td>
+              <td class="num-cell">₹23,408.00</td>
+              <td class="num-cell">₹47,240.35</td>
+              <td class="num-cell">₹62,905.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chart-wrap">
+        <p class="chart-title">Export revenue contribution share, FY 2013-14 to FY 2025-26</p>
+        <p class="chart-note">% of total operational revenue earned outside India. Bajaj has consistently exported the largest share of its business by far; TVS and Eicher both stepped up sharply from FY19 onward.</p>
+        <svg width="100%" viewBox="0 0 820 460" role="img" aria-label="Line chart of export revenue contribution share for Hero, Eicher, TVS and Bajaj from 2013-14 to 2025-26">
+        <g transform="translate(66,14)"><circle cx="4" cy="0" r="4" fill="var(--c-hero)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Hero</text></g><g transform="translate(216,14)"><rect x="0.6000000000000001" y="-3.4" width="6.8" height="6.8" fill="var(--c-eicher)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Eicher</text></g><g transform="translate(366,14)"><polygon points="4,-4.6 -0.5999999999999996,3.4499999999999997 8.6,3.4499999999999997" fill="var(--c-tvs)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">TVS</text></g><g transform="translate(516,14)"><polygon points="4,-4 8,0 4,4 0,0" fill="var(--c-bajaj)"/><text class="chart-legend" x="14" y="0" dominant-baseline="central">Bajaj</text></g>
+        <line class="chart-gridline chart-zero" x1="66" y1="418.0" x2="804" y2="418.0"/>
+        <text class="chart-ytick" x="56" y="418.0" text-anchor="end" dominant-baseline="central">0%</text>
+        <line class="chart-gridline" x1="66" y1="341.2" x2="804" y2="341.2"/>
+        <text class="chart-ytick" x="56" y="341.2" text-anchor="end" dominant-baseline="central">10%</text>
+        <line class="chart-gridline" x1="66" y1="264.4" x2="804" y2="264.4"/>
+        <text class="chart-ytick" x="56" y="264.4" text-anchor="end" dominant-baseline="central">20%</text>
+        <line class="chart-gridline" x1="66" y1="187.6" x2="804" y2="187.6"/>
+        <text class="chart-ytick" x="56" y="187.6" text-anchor="end" dominant-baseline="central">30%</text>
+        <line class="chart-gridline" x1="66" y1="110.8" x2="804" y2="110.8"/>
+        <text class="chart-ytick" x="56" y="110.8" text-anchor="end" dominant-baseline="central">40%</text>
+        <line class="chart-gridline" x1="66" y1="34.0" x2="804" y2="34.0"/>
+        <text class="chart-ytick" x="56" y="34.0" text-anchor="end" dominant-baseline="central">50%</text>
+        <text class="chart-xtick" x="66.0" y="436" text-anchor="middle">2013-14</text>
+        <text class="chart-xtick" x="127.5" y="436" text-anchor="middle">2014-15</text>
+        <text class="chart-xtick" x="189.0" y="436" text-anchor="middle">2015-16</text>
+        <text class="chart-xtick" x="250.5" y="436" text-anchor="middle">2016-17</text>
+        <text class="chart-xtick" x="312.0" y="436" text-anchor="middle">2017-18</text>
+        <text class="chart-xtick" x="373.5" y="436" text-anchor="middle">2018-19</text>
+        <text class="chart-xtick" x="435.0" y="436" text-anchor="middle">2019-20</text>
+        <text class="chart-xtick" x="496.5" y="436" text-anchor="middle">2020-21</text>
+        <text class="chart-xtick" x="558.0" y="436" text-anchor="middle">2021-22</text>
+        <text class="chart-xtick" x="619.5" y="436" text-anchor="middle">2022-23</text>
+        <text class="chart-xtick" x="681.0" y="436" text-anchor="middle">2023-24</text>
+        <text class="chart-xtick" x="742.5" y="436" text-anchor="middle">2024-25</text>
+        <text class="chart-xtick" x="804.0" y="436" text-anchor="middle">2025-26</text>
+        <polyline class="chart-line" points="66.0,379.6 127.5,376.5 189.0,398.0 250.5,401.1 312.0,387.3 373.5,389.6 435.0,384.2 496.5,388.8 558.0,368.1 619.5,384.2 681.0,381.9 742.5,348.1 804.0,322.0" stroke="var(--c-hero)"/>
+        <circle class="chart-dot" cx="66.0" cy="379.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="127.5" cy="376.5" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="189.0" cy="398.0" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="250.5" cy="401.1" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="312.0" cy="387.3" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="373.5" cy="389.6" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="435.0" cy="384.2" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="496.5" cy="388.8" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="558.0" cy="368.1" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="619.5" cy="384.2" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="681.0" cy="381.9" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="742.5" cy="348.1" r="3.4" fill="var(--c-hero)"/>
+        <circle class="chart-dot" cx="804.0" cy="322.0" r="3.4" fill="var(--c-hero)"/>
+        <polyline class="chart-line" points="66.0,398.8 127.5,402.6 189.0,391.1 250.5,397.3 312.0,395.0 373.5,388.0 435.0,348.1 496.5,343.5 558.0,289.0 619.5,300.5 681.0,325.8 742.5,306.6 804.0,303.6" stroke="var(--c-eicher)"/>
+        <rect class="chart-dot" x="63.1" y="395.9" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="124.6" y="399.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="186.1" y="388.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="247.6" y="394.4" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="309.1" y="392.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="370.6" y="385.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="432.1" y="345.2" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="493.6" y="340.6" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="555.1" y="286.1" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="616.6" y="297.6" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="678.1" y="323.0" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="739.6" y="303.8" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <rect class="chart-dot" x="801.1" y="300.7" width="5.8" height="5.8" fill="var(--c-eicher)"/>
+        <polyline class="chart-line" points="66.0,331.2 127.5,347.3 189.0,335.1 250.5,328.9 312.0,329.7 373.5,236.0 435.0,234.4 496.5,234.4 558.0,149.2 619.5,229.8 681.0,259.0 742.5,257.5 804.0,239.8" stroke="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="66.0,324.8 59.5,336.1 72.5,336.1" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="127.5,340.9 121.0,352.2 134.0,352.2" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="189.0,328.6 182.5,339.9 195.5,339.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="250.5,322.5 244.0,333.8 257.0,333.8" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="312.0,323.2 305.5,334.5 318.5,334.5" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="373.5,229.5 367.0,240.8 380.0,240.8" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="435.0,228.0 428.5,239.3 441.5,239.3" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="496.5,228.0 490.0,239.3 503.0,239.3" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="558.0,142.7 551.5,154.0 564.5,154.0" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="619.5,223.4 613.0,234.7 626.0,234.7" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="681.0,252.6 674.5,263.9 687.5,263.9" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="742.5,251.0 736.0,262.3 749.0,262.3" fill="var(--c-tvs)"/>
+        <polygon class="chart-dot" points="804.0,233.4 797.5,244.7 810.5,244.7" fill="var(--c-tvs)"/>
+        <polyline class="chart-line" points="66.0,114.6 127.5,80.1 189.0,116.2 250.5,169.2 312.0,140.0 373.5,132.3 435.0,119.2 496.5,82.4 558.0,38.6 619.5,123.9 681.0,176.8 742.5,179.9 804.0,168.4" stroke="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="66.0,109.2 71.4,114.6 66.0,120.1 60.6,114.6" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="127.5,74.6 132.9,80.1 127.5,85.5 122.1,80.1" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="189.0,110.7 194.4,116.2 189.0,121.6 183.6,116.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="250.5,163.7 255.9,169.2 250.5,174.6 245.1,169.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="312.0,134.5 317.4,140.0 312.0,145.4 306.6,140.0" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="373.5,126.9 378.9,132.3 373.5,137.7 368.1,132.3" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="435.0,113.8 440.4,119.2 435.0,124.7 429.6,119.2" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="496.5,76.9 501.9,82.4 496.5,87.8 491.1,82.4" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="558.0,33.2 563.4,38.6 558.0,44.0 552.6,38.6" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="619.5,118.4 624.9,123.9 619.5,129.3 614.1,123.9" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="681.0,171.4 686.4,176.8 681.0,182.3 675.6,176.8" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="742.5,174.5 747.9,179.9 742.5,185.4 737.1,179.9" fill="var(--c-bajaj)"/>
+        <polygon class="chart-dot" points="804.0,163.0 809.4,168.4 804.0,173.8 798.6,168.4" fill="var(--c-bajaj)"/>
+      </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cogs-block">
+    <div class="section-head">
+      <p class="eyebrow">Bill of materials</p>
+      <h2>Cost of Goods Sold <span class="alt">The direct cost of building what was sold — not head office, not marketing, just the factory.</span></h2>
+    </div>
+
+    <div class="wheel-wrap">
+      <p class="wheel-title">The seven components of COGS</p>
+      <p class="wheel-note">Shown as equal spokes on purpose — no weighting yet. Once real cost-of-materials figures come in, this can be redrawn to scale.</p>
+      <svg width="100%" viewBox="0 0 760 620" role="img" aria-label="Wheel diagram showing seven cost components that make up cost of goods sold, arranged as equal spokes around a central COGS hub">
+        <path class="wheel-seg" fill="#3C7268" d="M380.0,155.0 A155,155 0 0,1 501.2,213.4 L448.8,255.1 A88,88 0 0,0 380.0,222.0 Z"/>
+        <path class="wheel-seg" fill="#A8703A" d="M501.2,213.4 A155,155 0 0,1 531.1,344.5 L465.8,329.6 A88,88 0 0,0 448.8,255.1 Z"/>
+        <path class="wheel-seg" fill="#5B8A82" d="M531.1,344.5 A155,155 0 0,1 447.3,449.7 L418.2,389.3 A88,88 0 0,0 465.8,329.6 Z"/>
+        <path class="wheel-seg" fill="#C08A3E" d="M447.3,449.7 A155,155 0 0,1 312.7,449.7 L341.8,389.3 A88,88 0 0,0 418.2,389.3 Z"/>
+        <path class="wheel-seg" fill="#2C5850" d="M312.7,449.7 A155,155 0 0,1 228.9,344.5 L294.2,329.6 A88,88 0 0,0 341.8,389.3 Z"/>
+        <path class="wheel-seg" fill="#8A5B2C" d="M228.9,344.5 A155,155 0 0,1 258.8,213.4 L311.2,255.1 A88,88 0 0,0 294.2,329.6 Z"/>
+        <path class="wheel-seg" fill="#7FB0A6" d="M258.8,213.4 A155,155 0 0,1 380.0,155.0 L380.0,222.0 A88,88 0 0,0 311.2,255.1 Z"/>
+
+        <circle class="wheel-hub" cx="380" cy="310" r="88"/>
+        <text class="wheel-hub-label" x="380" y="303" text-anchor="middle">COGS</text>
+        <text class="wheel-hub-sub" x="380" y="325" text-anchor="middle">7 components</text>
+
+        <line class="wheel-leader" x1="450.7" y1="163.1" x2="462.9" y2="137.9" stroke="#3C7268"/>
+        <text class="wheel-label" x="468.9" y="125.3" text-anchor="start" dominant-baseline="central"><tspan fill="#3C7268" font-weight="700">01</tspan> Direct Materials</text>
+
+        <line class="wheel-leader" x1="538.9" y1="273.7" x2="566.2" y2="267.5" stroke="#A8703A"/>
+        <text class="wheel-label" x="579.9" y="264.4" text-anchor="start" dominant-baseline="central"><tspan fill="#A8703A" font-weight="700">02</tspan> Direct Labor</text>
+
+        <line class="wheel-leader" x1="507.4" y1="411.6" x2="529.3" y2="429.1" stroke="#5B8A82"/>
+        <text class="wheel-label" x="540.3" y="437.8" text-anchor="start" dominant-baseline="central"><tspan fill="#5B8A82" font-weight="700">03</tspan> Variable Mfg Overhead</text>
+
+        <line class="wheel-leader" x1="380.0" y1="473.0" x2="380.0" y2="501.0" stroke="#C08A3E"/>
+        <text class="wheel-label" x="380.0" y="515.0" text-anchor="middle" dominant-baseline="central"><tspan fill="#C08A3E" font-weight="700">04</tspan> Fixed Mfg Overhead</text>
+
+        <line class="wheel-leader" x1="252.6" y1="411.6" x2="230.7" y2="429.1" stroke="#2C5850"/>
+        <text class="wheel-label" x="219.7" y="437.8" text-anchor="end" dominant-baseline="central"><tspan fill="#2C5850" font-weight="700">05</tspan> Logistics (Freight-In)</text>
+
+        <line class="wheel-leader" x1="221.1" y1="273.7" x2="193.8" y2="267.5" stroke="#8A5B2C"/>
+        <text class="wheel-label" x="180.1" y="264.4" text-anchor="end" dominant-baseline="central"><tspan fill="#8A5B2C" font-weight="700">06</tspan> Change in Inventory</text>
+
+        <line class="wheel-leader" x1="309.3" y1="163.1" x2="297.1" y2="137.9" stroke="#7FB0A6"/>
+        <text class="wheel-label" x="291.1" y="125.3" text-anchor="end" dominant-baseline="central"><tspan fill="#7FB0A6" font-weight="700">07</tspan> Write-Downs &amp; Scrap</text>
+      </svg>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 01 of 07</span>
+      <h3 class="headline">Direct Materials</h3>
+      <p class="sub-dek">The physical stuff bolted, glued, or poured into the vehicle. If it becomes a permanent part of the product, it's counted here.</p>
+      <span class="stat-pill">~62% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> Direct materials are usually the single largest cost a manufacturer carries, and the one most exposed to forces it can't control — steel and aluminum prices move with global commodity markets, not with how efficiently the factory is run.</p>
+      <div class="callout-box">Most readers assume "materials" means only raw steel and plastic. It also includes ready-made parts bought from outside suppliers — tires, batteries, brake calipers — anything that arrives finished and gets bolted straight onto the product.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Commodity-exposed</b> — steel, aluminum and rubber prices swing with global markets, not company performance</li>
+        <li><b>Includes bought-out parts</b> — tires, batteries, brake calipers, instrument clusters from outside vendors</li>
+        <li><b>Consumables count too</b> — engine oil, brake fluid, paint sprayed on at the factory</li>
+        <li><b>Packaging included</b> — protective film and crates used before the product ships out</li>
+        <li><b>Usually the biggest single COGS line</b> for any vehicle manufacturer</li>
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 02 of 07</span>
+      <h3 class="headline">Direct Labor</h3>
+      <p class="sub-dek">Wages paid to the people whose physical hands or machine operation turn raw materials into a finished product — not the people who manage them.</p>
+      <span class="stat-pill">~9% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> Direct labor is deliberately narrow. It only counts pay for workers directly transforming the product — assembly, welding, painting. The moment someone's job is to supervise, plan, or support rather than build, their salary moves out of COGS and into Operating Expenses instead.</p>
+      <div class="callout-box">A common mix-up: production bonuses count here because they're tied to output, but a plant manager's salary does not — even though both people work inside the same factory.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Assembly line wages</b> — workers fitting engines, wiring, wheels</li>
+        <li><b>Welding &amp; paint shop pay</b> — specialized technicians on chassis and spray booths</li>
+        <li><b>Output-linked bonuses</b> — extra pay tied to meeting daily production targets</li>
+        <li><b>Contract &amp; temporary labor</b> — workers hired for surge capacity on the line</li>
+        <li><b>Excludes supervisors and plant management</b> — that's Fixed Overhead, not Direct Labor</li>
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 03 of 07</span>
+      <h3 class="headline">Variable Manufacturing Overhead</h3>
+      <p class="sub-dek">Factory costs that rise and fall automatically with how much the factory produces. Slow the line down, and these costs shrink with it.</p>
+      <span class="stat-pill">~8% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> This is the clearest test of "variable" in accounting: if production stopped completely for a week, this entire category would fall close to zero. That's what separates it from Fixed Overhead, which keeps running whether or not a single product is built.</p>
+      <div class="callout-box">Job-work payments to outside vendors — like sending a batch of gears out for heat treatment — belong here too, even though the work happens outside the company's own factory walls.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Scales with output</b> — rises and falls directly with production volume</li>
+        <li><b>Machine power</b> — electricity for welding robots, stamping presses, paint ovens</li>
+        <li><b>Tooling wear</b> — drill bits and cutting tools replaced after set production cycles</li>
+        <li><b>Outsourced job-work</b> — vendors handling specific processing steps on batches</li>
+        <li><b>Quality testing</b> — materials consumed during emission and calibration checks</li>
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 04 of 07</span>
+      <h3 class="headline">Fixed Manufacturing Overhead</h3>
+      <p class="sub-dek">The baseline cost of simply keeping the factory open — whether it builds 1 product or 10,000 this month.</p>
+      <span class="stat-pill">~6% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> Fixed overhead doesn't care about volume. Rent is rent whether the line runs at full capacity or sits idle for maintenance — which is exactly why it's dangerous during a slowdown. Revenue falls with fewer units sold, but this cost stays the same, squeezing margins.</p>
+      <div class="callout-box">One deliberate exclusion here: depreciation on factory machinery is <em>not</em> included in this bucket. It's tracked as its own separate line under Operating Expenses, so it isn't counted twice across the income statement.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Doesn't scale with volume</b> — same cost whether output is high or low</li>
+        <li><b>Factory rent &amp; lease</b> — for the land and buildings production happens in</li>
+        <li><b>Plant insurance</b> — coverage against fire, flood, industrial accidents</li>
+        <li><b>Factory management pay</b> — supervisors, safety officers, plant managers, security</li>
+        <li><b>Depreciation is excluded</b> — reported separately under Operating Expenses</li>
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 05 of 07</span>
+      <h3 class="headline">Logistics Tied to Production</h3>
+      <p class="sub-dek">The cost of getting raw materials and components from suppliers to the factory gate — inbound only.</p>
+      <span class="stat-pill">~5% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> The direction matters here. Freight-in — shipping steel, batteries, or imported components into the factory — is a production cost. Freight-out — shipping a finished product to a dealer — is a completely different cost, classified as a selling expense, not COGS.</p>
+      <div class="callout-box">Import duties on components sourced from overseas suppliers, like electronic microchips or fuel-injector parts, count in this bucket too, alongside the shipping cost itself.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Inbound only</b> — materials and parts coming in, not finished goods going out</li>
+        <li><b>Ocean freight &amp; customs</b> — shipping fees and import tariffs on overseas components</li>
+        <li><b>Domestic trucking</b> — hauling steel or batteries from suppliers to the factory</li>
+        <li><b>Excludes freight-out</b> — shipping finished products to dealers is a selling expense instead</li>
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 06 of 07</span>
+      <h3 class="headline">Change in Inventory</h3>
+      <p class="sub-dek">Not a real cash cost — an accounting adjustment that lines up spending with what was actually sold.</p>
+      <span class="stat-pill">~6% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> A factory doesn't finish and sell every product in the same month it starts building it. This line makes sure the cost of half-built or unsold products doesn't hit the income statement early — it only counts as a cost once a dealer actually buys the finished vehicle.</p>
+      <div class="callout-box">This is the one COGS component that can be genuinely confusing at first: an <em>increase</em> in inventory actually reduces reported COGS for the period, because that cost hasn't "left" the company yet — it's just sitting on the balance sheet as stock.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Timing adjustment, not new spending</b> — reallocates cost to when a sale actually happens</li>
+        <li><b>Work-in-progress</b> — half-assembled products still on the line at period-end</li>
+        <li><b>Finished goods in storage</b> — completed products waiting in a warehouse, unsold</li>
+        <li><b>Rising inventory lowers COGS</b> — cost sits on the balance sheet until the product sells</li>
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <span class="eyebrow-pill">Direct cost · 07 of 07</span>
+      <h3 class="headline">Write-Downs, Scrap &amp; Obsolescence</h3>
+      <p class="sub-dek">The cost of material that entered the factory but never became a product anyone could sell.</p>
+      <span class="stat-pill">~4% of total COGS</span>
+      <hr class="detail-rule">
+      <p class="core-idea"><b>Core idea.</b> Every factory loses some material to waste — that's normal. What matters for an investor is the trend. A rising write-down line over several years can quietly signal declining quality control, aging equipment, or products falling out of date faster than the company can sell through old parts.</p>
+      <div class="callout-box">A mid-year design change can turn perfectly good inventory into waste overnight — A company switching from carburetors to fuel injection, for example, would have made any unused carburetor stock instantly obsolete.</div>
+      <p class="char-heading">Key characteristics:</p>
+      <ul class="char-list">
+        <li><b>Production scrap</b> — leftover raw material waste, like stamped-out steel offcuts</li>
+        <li><b>In-process damage</b> — parts dropped, scratched, or broken during assembly</li>
+        <li><b>Engineering obsolescence</b> — components made unusable by a mid-year design change</li>
+        <li><b>Worth watching over time</b> — a rising trend can flag quality or planning problems</li>
+      </ul>
+    </div>
+
+    <div class="bom-rail"><span>01 – 07 sum to Total COGS</span><span class="line"></span></div>
+  </section>
+
+  <section class="gp-block">
+    <div class="gp-strip">
+      <div class="gp-eq">Revenue − COGS = <strong>Gross Profit</strong></div>
+      <h2>Gross Profit</h2>
+      <p>What's left after paying only the direct cost of building the products that were sold — before a single rupee of marketing, R&amp;D, admin salaries, depreciation, interest, or tax is counted.</p>
+      <p>Tracked side by side, <span class="callout">Revenue and COGS reveal how much came in and what it directly cost to build, for every single year</span> — the first, cleanest signal of whether the business is getting more or less efficient at making the product over time.</p>
+      <div class="year-rail">
+        <span>2012</span><span>2013</span><span>2014</span><span>2015</span><span>2016</span>
+        <span>2017</span><span>2018</span><span>2019</span><span>2020</span><span>2021</span>
+        <span>2022</span><span>2023</span><span>2024</span><span>2025</span><span>2026</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
